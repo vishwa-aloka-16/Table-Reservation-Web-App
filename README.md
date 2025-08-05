@@ -1,1 +1,1 @@
-# Click https://github.com/vishwa-aloka-16/DineTime-master to redirect
+# Click https://github.com/vishwa-aloka-16/DineTime-master to redirect to the correct repository 
