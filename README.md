@@ -1,2 +1,1 @@
-# Table-Reservation-Web-App
-Table Reservation Web Application With Java Servlet and JSP
+# Click https://github.com/vishwa-aloka-16/DineTime-master to redirect
