@@ -1,84 +1,165 @@
-# ROSS AI
+# Ross
 
-<p align="center">
-  <a href="https://ross-ai.netlify.app/"><strong>Explore the Web App</strong></a>
-  |
-  <a href="https://github.com/vishwa-aloka-16/ross-webapp"><strong>Production Repository</strong></a>
-</p>
+Ross is an AI-powered legal document analysis platform for uploading contracts and legal PDFs, generating structured summaries, and asking document-grounded questions through a chat interface.
 
----
+Live app: https://ross-ai.netlify.app/  
+Repository: https://github.com/vishwa-aloka-16/ross-webapp
 
-## Live Deployment Notice
+## Overview
 
-> **Performance Note:** ROSS is currently hosted utilizing free-tier infrastructure. If the application has been idle, backend services may require a brief initialization period. Please allow **30 to 50 seconds** upon your initial request for the server instances to spin up and respond properly.
+Ross is split into three services:
 
----
+- `webapp/` - the React frontend used by end users
+- `gateway/` - the Node.js API layer for auth, document workflows, and service orchestration
+- `ai-service/` - the Python AI pipeline for ingestion, clustering, summary trees, retrieval, and answer generation
 
-## System Overview
+## Features
 
-ROSS is an AI-powered legal document analysis platform designed to ingest contracts and legal PDFs, generate hierarchical structured summaries, and provide document-grounded insights through an interactive chat interface. 
+- User registration and login
+- PDF upload and document tracking
+- Background ingestion pipeline
+- Legal document summarization
+- Hierarchical summary tree generation
+- RAG-based document Q&A with citations
+- Support for different legal document layout strategies
 
-The architecture is split into three decoupled services:
-* **`webapp/`** – A responsive React frontend optimized for user interaction.
-* **`gateway/`** – A Node.js API layer managing authentication, document workflows, and service orchestration.
-* **`ai-service/`** – A Python-based AI pipeline executing PDF ingestion, clustering, semantic tree generation, and retrieval-augmented generation (RAG).
+## Architecture
 
----
+1. The frontend uploads documents and sends authenticated requests to the gateway.
+2. The gateway stores document metadata, uploads files to Supabase Storage, and queues AI ingestion.
+3. The AI service extracts PDF text, chunks the content, creates embeddings, clusters sections, and stores nodes in pgvector.
+4. The frontend can then request summary trees and ask questions against indexed documents.
 
-## Key Features
+## Tech Stack
 
-* **Authentication & Document Tracking:** Secure user onboarding and comprehensive status tracking for uploaded files.
-* **Automated Ingestion Pipeline:** Asynchronous text extraction and layout processing for dense legal documentation.
-* **Hierarchical Summary Trees:** Structural aggregation of document sections to capture both high-level context and granular details.
-* **Contextual Q&A:** RAG-driven conversational interface delivering responses strictly grounded in the document text, complete with precise citations.
+### Frontend
 
----
+- `React 19` for the user interface
+- `Vite` for fast development and production builds
+- `React Markdown` and `remark-gfm` for rendering rich markdown responses
+- `react-syntax-highlighter` for formatted code or structured content blocks
+- Plain CSS and custom component styling for the UI
 
-## System Architecture
+### Gateway
 
-1. **Client Interaction:** The frontend transmits authenticated document uploads and API requests to the Central Gateway.
-2. **Orchestration & Storage:** The gateway persists primary metadata in MongoDB, transfers the raw PDF binary to Supabase Storage, and dispatches an ingestion trigger to the AI Service.
-3. **Semantic Processing:** The Python service extracts document structures, chunks content using layout-aware strategies, generates vector embeddings, and structures contextual nodes within a Postgres `pgvector` instance.
-4. **Retrieval & Synthesis:** The user queries the system via the frontend, prompting the gateway to interface with the AI pipeline for vector similarity matching, summary generation, and LLM synthesis.
+- `Node.js` as the JavaScript runtime
+- `Express` for HTTP APIs
+- `Mongoose` for MongoDB models and persistence
+- `jsonwebtoken` for JWT-based authentication
+- `bcryptjs` for password hashing
+- `multer` for file upload handling
+- `dotenv` for environment variable management
+- `@supabase/supabase-js` for storage operations
 
----
+### AI Service
 
-## Technical Specification
+- `Python` for the document intelligence pipeline
+- `Flask` for the AI API server
+- `Gunicorn` for production serving
+- `Pydantic` and `pydantic-settings` for request validation and configuration
+- `httpx` for service-to-service HTTP calls
+- `PyPDF` for PDF text extraction
+- `NumPy`, `SciPy`, and `scikit-learn` for clustering and analysis
+- `google-genai` for Gemini-powered summarization, embeddings, and answer generation
+- `psycopg` and `pgvector` for vector storage and retrieval in Postgres
+- `supabase` Python client for storage access
 
-### Core Infrastructure & Models
-* **Language Models & Embeddings:** Gemini API
-* **Vector Database:** Supabase Postgres + `pgvector`
-* **Metadata Store:** MongoDB Atlas
-* **Object Storage:** Supabase Storage
+## Data and Infrastructure
 
-### Frontend Service (`webapp/`)
-* Runtime Framework: React 19 / Vite
-* Rich Text Rendering: React Markdown / Remark GFM
-* Code & Structure Highlighting: React Syntax Highlighter
-* Interface Styling: Native CSS Architecture
+- `MongoDB Atlas` stores users and document metadata
+- `Supabase Storage` stores uploaded PDFs
+- `Supabase Postgres + pgvector` stores embeddings and summary tree nodes
+- `Gemini` powers summarization, embeddings, and question answering
 
-### Application Gateway (`gateway/`)
-* Engine: Node.js / Express
-* Data Modeling: Mongoose
-* Security: JSON Web Tokens (JWT) / BcryptJS
-* File Processing: Multer
-* Infrastructure Clients: Supabase JS SDK
+## Deployment
 
-### Intelligence Service (`ai-service/`)
-* Engine: Python / Flask / Gunicorn
-* Schema Validation: Pydantic v2 / Pydantic Settings
-* Document Intelligence: PyPDF
-* Mathematical & Clustering Utilities: NumPy / SciPy / Scikit-Learn
-* Vector Operations: Psycopg 3 / pgvector-python
-* Inference Engine: Google GenAI SDK
-
----
+- `Netlify` hosts the frontend
+- `Render` hosts the gateway
+- `Render` can also host the AI service
+- `GitHub` is used for source control and deployment integration
 
 ## Repository Structure
 
 ```text
 ross-webapp/
-├── webapp/           # React application layer
-├── gateway/          # Node.js orchestration and API layer
-├── ai-service/       # Python semantic processing pipeline
-└── data/             # Local testing assets and document templates
+├── webapp/        # React frontend
+├── gateway/       # Node/Express backend
+├── ai-service/    # Python AI service
+└── data/          # local test assets and sample files
+```
+
+## Environment Files
+
+Example env files are included here:
+
+- `webapp/.env.example`
+- `gateway/.env.example`
+- `ai-service/.env.example`
+
+Do not commit real secrets. Use your deployment platform's environment variable settings for production credentials.
+
+## Local Development
+
+### Frontend
+
+```bash
+cd webapp
+npm install
+npm run dev
+```
+
+### Gateway
+
+```bash
+cd gateway
+npm install
+npm start
+```
+
+### AI Service
+
+```bash
+cd ai-service
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+python main.py
+```
+
+## Production Build Settings
+
+### Netlify
+
+- Base directory: `webapp`
+- Build command: `npm run build`
+- Publish directory: `dist`
+- Frontend environment variable: `VITE_API_BASE_URL`
+
+### Render Gateway
+
+- Root directory: `gateway`
+- Build command: `npm install`
+- Start command: `npm start`
+
+### Render AI Service
+
+- Root directory: `ai-service`
+- Build command: `pip install -r requirements.txt`
+- Start command: `gunicorn --bind 0.0.0.0:$PORT main:app`
+
+## Key Tools Used
+
+- `Git` and `GitHub` for version control
+- `Netlify` for frontend deployment
+- `Render` for backend and AI service deployment
+- `MongoDB Atlas` for document/user data
+- `Supabase` for file storage and vector-backed Postgres data
+- `Gemini` for LLM and embedding capabilities
+- `ESLint` for frontend linting
+
+## Notes
+
+- The frontend expects a `VITE_API_BASE_URL` pointing to the deployed gateway.
+- The gateway must be configured with the correct `CORS_ORIGIN` for the frontend domain.
+- The AI service needs a valid `SUPABASE_DB_URL` to read and write pgvector-backed nodes.
+- The gateway and AI service should share the same `INTERNAL_SERVICE_KEY`.
