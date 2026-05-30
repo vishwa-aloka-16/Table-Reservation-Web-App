@@ -14,51 +14,71 @@
 
 ---
 
-## Project Overview
+## System Overview
 
-ROSS is an intelligent, full-stack web application engineered to bridge high-end digital innovation with technical precision. Designed with a sleek, minimalist aesthetic, the platform delivers a seamless, responsive user experience optimized for modern web workflows.
+ROSS is an AI-powered legal document analysis platform designed to ingest contracts and legal PDFs, generate hierarchical structured summaries, and provide document-grounded insights through an interactive chat interface. 
 
-* **Live Web Application:** [ross-ai.netlify.app](https://ross-ai.netlify.app/)
-* **Production Repository:** [github.com/vishwa-aloka-16/ross-webapp](https://github.com/vishwa-aloka-16/ross-webapp)
+The architecture is split into three decoupled services:
+* **`webapp/`** – A responsive React frontend optimized for user interaction.
+* **`gateway/`** – A Node.js API layer managing authentication, document workflows, and service orchestration.
+* **`ai-service/`** – A Python-based AI pipeline executing PDF ingestion, clustering, semantic tree generation, and retrieval-augmented generation (RAG).
 
 ---
 
 ## Key Features
 
-* **Intelligent Interface:** A highly intuitive, user-centric environment engineered for seamless interaction.
-* **Responsive Architecture:** Optimized visual structures across mobile, tablet, and desktop viewports.
-* **Technical Minimalism:** Clean typography, structured layouts, and an emphasis on architectural clarity.
-* **Robust Integration:** Scalable pipelines handling client-server data exchange with optimized latency post-initialization.
+* **Authentication & Document Tracking:** Secure user onboarding and comprehensive status tracking for uploaded files.
+* **Automated Ingestion Pipeline:** Asynchronous text extraction and layout processing for dense legal documentation.
+* **Hierarchical Summary Trees:** Structural aggregation of document sections to capture both high-level context and granular details.
+* **Contextual Q&A:** RAG-driven conversational interface delivering responses strictly grounded in the document text, complete with precise citations.
 
 ---
 
-## Tech Stack
+## System Architecture
 
-### Frontend
-* Framework: React / Vite
-* Styling: Tailwind CSS
-
-### Backend & Database
-* Runtime Environment: Node.js / Express
-* Database Management: MongoDB
-
-### Deployment & Infrastructure
-* Client Hosting: Netlify
-* Server Hosting: Free-tier Cloud Infrastructure
+1. **Client Interaction:** The frontend transmits authenticated document uploads and API requests to the Central Gateway.
+2. **Orchestration & Storage:** The gateway persists primary metadata in MongoDB, transfers the raw PDF binary to Supabase Storage, and dispatches an ingestion trigger to the AI Service.
+3. **Semantic Processing:** The Python service extracts document structures, chunks content using layout-aware strategies, generates vector embeddings, and structures contextual nodes within a Postgres `pgvector` instance.
+4. **Retrieval & Synthesis:** The user queries the system via the frontend, prompting the gateway to interface with the AI pipeline for vector similarity matching, summary generation, and LLM synthesis.
 
 ---
 
-## Getting Started
+## Technical Specification
 
-Follow these steps to configure and execute the project within a local development environment.
+### Core Infrastructure & Models
+* **Language Models & Embeddings:** Gemini API
+* **Vector Database:** Supabase Postgres + `pgvector`
+* **Metadata Store:** MongoDB Atlas
+* **Object Storage:** Supabase Storage
 
-### Prerequisites
-* Node.js (v18.x or higher recommended)
-* npm or yarn
+### Frontend Service (`webapp/`)
+* Runtime Framework: React 19 / Vite
+* Rich Text Rendering: React Markdown / Remark GFM
+* Code & Structure Highlighting: React Syntax Highlighter
+* Interface Styling: Native CSS Architecture
 
-### Installation and Configuration
+### Application Gateway (`gateway/`)
+* Engine: Node.js / Express
+* Data Modeling: Mongoose
+* Security: JSON Web Tokens (JWT) / BcryptJS
+* File Processing: Multer
+* Infrastructure Clients: Supabase JS SDK
 
-1. **Clone the repository:**
-```bash
-   git clone [https://github.com/vishwa-aloka-16/ross-webapp.git](https://github.com/vishwa-aloka-16/ross-webapp.git)
-   cd ross-webapp
+### Intelligence Service (`ai-service/`)
+* Engine: Python / Flask / Gunicorn
+* Schema Validation: Pydantic v2 / Pydantic Settings
+* Document Intelligence: PyPDF
+* Mathematical & Clustering Utilities: NumPy / SciPy / Scikit-Learn
+* Vector Operations: Psycopg 3 / pgvector-python
+* Inference Engine: Google GenAI SDK
+
+---
+
+## Repository Structure
+
+```text
+ross-webapp/
+├── webapp/           # React application layer
+├── gateway/          # Node.js orchestration and API layer
+├── ai-service/       # Python semantic processing pipeline
+└── data/             # Local testing assets and document templates
